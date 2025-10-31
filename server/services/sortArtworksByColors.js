@@ -8,17 +8,19 @@ export async function sortArtWorks(palette, artworks) {
       return { ...art, dominant };
     })
   );
-
+  console.log(`Colors extrated for ${artWorksWithColors.length} artworks`);
   // Sort artworks with palette from given image
   const sortedArtworks = artWorksWithColors
     .map((art) => {
       if (!art.dominant) return { ...art, score: Infinity };
-      const distances = palette.map((c) => colorDistance(c, art.dominant));
+      console.log(`Checking color distance for ${art.title}`);
+      const distances = palette.map((color) =>
+        colorDistance(color, art.dominant)
+      );
       const score = Math.min(...distances);
       return { ...art, score };
     })
     .sort((a, b) => a.score - b.score);
-
-  console.log("SORTED", sortedArtworks[0], sortedArtworks[155]);
+  console.log("All artworks have been sorted by colors");
   return sortedArtworks.slice(0, 15);
 }

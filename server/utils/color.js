@@ -6,20 +6,17 @@ export async function getDominantColor(imageUrl) {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
     if (!res.ok) throw new Error(`HTTP error! ${res.status}`);
-
     const buffer = await res.arrayBuffer();
-
     const palette = await Vibrant.from(Buffer.from(buffer)).getPalette();
-
     const rgb =
       palette.Vibrant?.rgb ||
       palette.Muted?.rgb ||
       palette.LightVibrant?.rgb ||
       palette.DarkMuted?.rgb;
-
+    console.log(`Dominant colors found for image ${imageUrl}`);
     return rgb || null;
   } catch (err) {
-    console.error("Erreur extraction couleur:", err.message);
+    console.error("Erreur extraction couleur:", err);
     return null;
   }
 }

@@ -4,6 +4,7 @@ const CHICAGO_API = "https://api.artic.edu/api/v1/artworks";
 const PARISMUSEES_API = " https://apicollections.parismusees.paris.fr/graphql";
 
 async function fetchMetArtworks(limit = 50) {
+  console.log("Searching in MET api");
   const search = await fetch(`${MET_API}/search?hasImages=true&q=painting`);
   const data = await search.json();
   const ids = data.objectIDs?.slice(0, limit) || [];
@@ -25,10 +26,12 @@ async function fetchMetArtworks(limit = 50) {
       console.log(err);
     }
   }
+  console.log(`${results.length} items found in MET api`);
   return results;
 }
 
 async function fetchRijksArtworks(limit = 100) {
+  console.log("Searching in Rijks api");
   const RIJKS_KEY = process.env.RIJKS_APIKEY;
   try {
     const res = await fetch(
@@ -36,6 +39,7 @@ async function fetchRijksArtworks(limit = 100) {
     );
     if (res) {
       const data = await res.json();
+      console.log(`${data.artObjects.length} items found in Rijks api`);
       return data.artObjects.map((obj) => ({
         id: obj.objectNumber,
         title: obj.title,
@@ -50,10 +54,12 @@ async function fetchRijksArtworks(limit = 100) {
 }
 
 async function fetchChicagoInstituteArtworks(limit = 100) {
+  console.log("Searching in Art Institute of Chicago api");
   const res = await fetch(
     `${CHICAGO_API}?limit=${limit}&fields=id,title,artist_title,image_id`
   );
   const { data } = await res.json();
+  console.log(`${data.length} items found in Art Institute of Chicago api`);
   return data
     .filter((obj) => obj.image_id)
     .map((obj) => ({
@@ -116,5 +122,7 @@ export async function fetchAllArtworks() {
     fetchRijksArtworks(),
     fetchChicagoInstituteArtworks(),
   ]);
-  return metResults.concat(gettyResults, chicagoResults);
+  const allItems = metResults.concat(gettyResults, chicagoResults);
+  console.log(`${allItems.length} total items found in all apis`);
+  return allItems;
 }
